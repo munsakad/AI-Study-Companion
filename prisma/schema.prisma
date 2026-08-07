@@ -14,9 +14,12 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
 
-  decks   Deck[]
-  quizzes Quiz[]
-  attempts Attempt[]
+  decks          Deck[]
+  quizzes        Quiz[]
+  attempts       Attempt[]
+  reviewLogs     ReviewLog[]
+  generationLogs GenerationLog[]
+  tags           Tag[]
 }
 
 model Deck {
@@ -28,7 +31,19 @@ model Deck {
   sourceText String // the notes/text this was generated from (truncated)
   flashcards Flashcard[]
   quiz       Quiz?
+  tags       Tag[]
   createdAt  DateTime    @default(now())
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  createdAt DateTime @default(now())
+  decks     Deck[]
+
+  @@unique([userId, name])
 }
 
 model Flashcard {
@@ -38,6 +53,43 @@ model Flashcard {
   front    String
   back     String
   position Int
+
+  // Spaced repetition state (simplified SM-2, see src/lib/spacedRepetition.ts).
+  // New cards default to dueAt: now — immediately due for first review.
+  easeFactor     Float       @default(2.5)
+  intervalDays   Int         @default(0)
+  repetitions    Int         @default(0)
+  dueAt          DateTime    @default(now())
+  lastReviewedAt DateTime?
+  reviews        ReviewLog[]
+}
+
+// One row per flashcard grading — feeds spaced-repetition history and,
+// together with Attempt.completedAt, the study-streak calculation.
+model ReviewLog {
+  id           String    @id @default(cuid())
+  flashcardId  String
+  flashcard    Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grade        Int // 0=Again 1=Hard 2=Good 3=Easy
+  intervalDays Int // resulting interval after this grading
+  easeFactor   Float // resulting ease factor after this grading
+  reviewedAt   DateTime  @default(now())
+
+  @@index([userId, reviewedAt])
+}
+
+// One row per successful /api/generate call — used to enforce a rolling
+// 24h per-user cap (see src/lib/rateLimit.ts) since Gemini usage costs
+// real money and had no cap at all before.
+model GenerationLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model Quiz {

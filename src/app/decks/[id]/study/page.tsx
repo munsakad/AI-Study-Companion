@@ -23,7 +23,11 @@ export default async function StudyPage({ params }: { params: { id: string } }) 
           <p className="text-xs font-bold uppercase tracking-wide text-navy-light">{deck.topic}</p>
           <h1 className="text-2xl font-bold text-navy">{deck.title}</h1>
         </div>
-        {deck.quiz && <Link href={`/quizzes/${deck.quiz.id}/take`} className="btn-secondary !py-1.5 !px-3 text-xs">Take quiz</Link>}
+        <div className="flex gap-2">
+          <Link href={`/study/review?deckId=${deck.id}`} className="btn-outline !py-1.5 !px-3 text-xs">Review due cards</Link>
+          <Link href={`/decks/${deck.id}/edit`} className="btn-outline !py-1.5 !px-3 text-xs">Edit deck</Link>
+          {deck.quiz && <Link href={`/quizzes/${deck.quiz.id}/take`} className="btn-secondary !py-1.5 !px-3 text-xs">Take quiz</Link>}
+        </div>
       </div>
 
       <StudyDeck cards={deck.flashcards.map((c) => ({ id: c.id, front: c.front, back: c.back }))} />

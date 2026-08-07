@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, authErrorResponse } from "@/lib/authorize";
 import { generateStudyMaterial, GenerationError } from "@/lib/gemini";
+import { checkGenerationLimit, recordGeneration } from "@/lib/rateLimit";
 
 async function extractText(form: FormData): Promise<string> {
   const pasted = (form.get("text") as string | null)?.trim();
@@ -26,6 +27,18 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     const user = requireAuth(session);
 
+    const limit = await checkGenerationLimit(user.id);
+    if (!limit.allowed) {
+      return Response.json(
+        {
+          error: `You've hit today's limit of ${limit.limit} AI generations. Try again after ${limit.resetAt.toLocaleString()}.`,
+          remaining: 0,
+          resetAt: limit.resetAt.toISOString(),
+        },
+        { status: 429 }
+      );
+    }
+
     const form = await req.formData();
     const sourceText = (await extractText(form)).trim();
     if (sourceText.length < 40) {
@@ -41,6 +54,8 @@ export async function POST(req: Request) {
         topic: generated.topic,
         sourceText: sourceText.slice(0, 5000),
         flashcards: {
+          // easeFactor/intervalDays/repetitions/dueAt take their schema
+          // defaults (immediately due) — nothing to set explicitly here.
           create: generated.flashcards.map((f, i) => ({ front: f.front, back: f.back, position: i })),
         },
         quiz: {
@@ -61,6 +76,11 @@ export async function POST(req: Request) {
       },
       include: { quiz: true },
     });
+
+    // Only charge quota once we know the generation actually succeeded and
+    // saved — a bad key or a transient Gemini failure shouldn't cost the
+    // user one of their daily generations.
+    await recordGeneration(user.id);
 
     return Response.json({ deckId: deck.id, quizId: deck.quiz!.id }, { status: 201 });
   } catch (err) {

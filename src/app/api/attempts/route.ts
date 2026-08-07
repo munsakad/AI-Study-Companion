@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, authErrorResponse } from "@/lib/authorize";
+import { scoreQuiz } from "@/lib/quizScoring";
 import { z } from "zod";
 
 const schema = z.object({
@@ -21,30 +22,23 @@ export async function POST(req: Request) {
     if (!quiz) return Response.json({ error: "Quiz not found" }, { status: 404 });
     if (quiz.userId !== user.id) return Response.json({ error: "Not your quiz" }, { status: 403 });
 
-    const byId = new Map(quiz.questions.map((q) => [q.id, q]));
-    let correctCount = 0;
-    const answerRows: { questionId: string; chosenIndex: number; correct: boolean }[] = [];
-
-    for (const a of body.answers) {
-      const q = byId.get(a.questionId);
-      if (!q) continue; // ignore answers referencing questions from a different quiz
-      const correct = a.chosenIndex === q.correctIndex;
-      if (correct) correctCount++;
-      answerRows.push({ questionId: a.questionId, chosenIndex: a.chosenIndex, correct });
-    }
-
-    const scorePercent = (correctCount / quiz.questions.length) * 100;
+    const result = scoreQuiz(quiz.questions, body.answers);
 
     const attempt = await prisma.attempt.create({
       data: {
         quizId: quiz.id,
         userId: user.id,
-        scorePercent,
-        answers: { create: answerRows },
+        scorePercent: result.scorePercent,
+        answers: { create: result.answers },
       },
     });
 
-    return Response.json({ attemptId: attempt.id, scorePercent, correctCount, total: quiz.questions.length });
+    return Response.json({
+      attemptId: attempt.id,
+      scorePercent: result.scorePercent,
+      correctCount: result.correctCount,
+      total: result.total,
+    });
   } catch (err: any) {
     if (err?.issues) return Response.json({ error: "Invalid input" }, { status: 400 });
     return authErrorResponse(err);
