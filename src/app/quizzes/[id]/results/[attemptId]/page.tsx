@@ -26,7 +26,7 @@ export default async function ResultsPage({ params }: { params: { id: string; at
         <p className="text-sm font-bold uppercase tracking-wide text-navy-light">{attempt.quiz.title}</p>
         <p className={`mt-2 text-4xl font-bold ${attempt.scorePercent >= 70 ? "text-ok" : "text-warn"}`}>{Math.round(attempt.scorePercent)}%</p>
         <p className="mt-1 text-sm text-gray-600">{correctCount} of {attempt.answers.length} correct</p>
-        {attempt.scorePercent < 70 && <p className="mt-2 text-sm text-warn">This one's flagged for review on your dashboard.</p>}
+        {attempt.scorePercent < 70 && <p className="mt-2 text-sm text-warn">This one&apos;s flagged for review on your dashboard.</p>}
       </div>
 
       <div className="mt-6 space-y-3">
