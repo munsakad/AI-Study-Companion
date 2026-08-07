@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  decks   Deck[]
+  quizzes Quiz[]
+  attempts Attempt[]
+}
+
+model Deck {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String
+  topic      String // short topic label, used for weak-topic grouping
+  sourceText String // the notes/text this was generated from (truncated)
+  flashcards Flashcard[]
+  quiz       Quiz?
+  createdAt  DateTime    @default(now())
+}
+
+model Flashcard {
+  id       String @id @default(cuid())
+  deckId   String
+  deck     Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  front    String
+  back     String
+  position Int
+}
+
+model Quiz {
+  id        String     @id @default(cuid())
+  deckId    String     @unique
+  deck      Deck       @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  questions Question[]
+  attempts  Attempt[]
+  createdAt DateTime   @default(now())
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  quizId        String
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  prompt        String
+  choices       String // JSON-encoded string[]
+  correctIndex  Int
+  explanation   String
+  position      Int
+
+  answers AttemptAnswer[]
+}
+
+model Attempt {
+  id           String          @id @default(cuid())
+  quizId       String
+  quiz         Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scorePercent Float
+  completedAt  DateTime        @default(now())
+  answers      AttemptAnswer[]
+}
+
+model AttemptAnswer {
+  id            String   @id @default(cuid())
+  attemptId     String
+  attempt       Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId    String
+  question      Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  chosenIndex   Int
+  correct       Boolean
+}
