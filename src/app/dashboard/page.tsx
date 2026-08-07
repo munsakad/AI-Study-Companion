@@ -3,16 +3,25 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import StreakBadge from "@/components/StreakBadge";
+import DeckSearchFilter from "@/components/DeckSearchFilter";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
-  const decks = await prisma.deck.findMany({
-    where: { userId: session.user.id },
-    include: { flashcards: { select: { id: true } }, quiz: { include: { attempts: { orderBy: { completedAt: "desc" }, take: 5 } } } },
-    orderBy: { createdAt: "desc" },
-  });
+  const [decks, dueCount] = await Promise.all([
+    prisma.deck.findMany({
+      where: { userId: session.user.id },
+      include: {
+        flashcards: { select: { id: true } },
+        tags: { select: { name: true } },
+        quiz: { include: { attempts: { orderBy: { completedAt: "desc" }, take: 5 } } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.flashcard.count({ where: { deck: { userId: session.user.id }, dueAt: { lte: new Date() } } }),
+  ]);
 
   // Recommendation logic: for each deck with quiz attempts, take the most
   // recent attempt's score. Below 70% = weak. Sort weakest first so the
@@ -28,10 +37,23 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-navy">Your study dashboard</h1>
-        <Link href="/decks/new" className="btn-secondary">Generate new deck</Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-navy">Your study dashboard</h1>
+          <StreakBadge userId={session.user.id} />
+        </div>
+        <div className="flex gap-2">
+          <Link href="/analytics" className="btn-outline">Analytics</Link>
+          <Link href="/decks/new" className="btn-secondary">Generate new deck</Link>
+        </div>
       </div>
+
+      {dueCount > 0 && (
+        <Link href="/study/review" className="card mt-4 flex items-center justify-between !py-3 hover:border-navy/30">
+          <span className="text-sm font-semibold text-navy">📚 {dueCount} card{dueCount === 1 ? "" : "s"} due for review</span>
+          <span className="text-xs font-bold text-navy-light">Start review session →</span>
+        </Link>
+      )}
 
       {weakTopics.length > 0 && (
         <div className="mt-6">
@@ -57,26 +79,19 @@ export default async function DashboardPage() {
 
       <div className="mt-8">
         <h2 className="text-lg font-bold text-navy">All decks</h2>
-        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {withScore.map(({ deck, latestScore, attemptCount }) => (
-            <div key={deck.id} className="card">
-              <p className="text-xs font-bold uppercase tracking-wide text-navy-light">{deck.topic}</p>
-              <h3 className="mt-1 font-bold text-navy">{deck.title}</h3>
-              <p className="mt-1 text-xs text-gray-500">{deck.flashcards.length} cards · {attemptCount} quiz attempt{attemptCount === 1 ? "" : "s"}</p>
-              {latestScore !== null && (
-                <span className={`badge mt-2 ${latestScore >= 70 ? "bg-ok/10 text-ok" : "bg-warn/15 text-warn"}`}>
-                  {Math.round(latestScore)}% last attempt
-                </span>
-              )}
-              <div className="mt-3 flex gap-2">
-                <Link href={`/decks/${deck.id}/study`} className="btn-outline !py-1.5 !px-3 text-xs">Flashcards</Link>
-                {deck.quiz && <Link href={`/quizzes/${deck.quiz.id}/take`} className="btn-secondary !py-1.5 !px-3 text-xs">Take quiz</Link>}
-              </div>
-            </div>
-          ))}
-          {withScore.length === 0 && (
-            <p className="col-span-full card text-center text-gray-500">No decks yet — generate your first one from your notes.</p>
-          )}
+        <div className="mt-3">
+          <DeckSearchFilter
+            decks={withScore.map(({ deck, latestScore, attemptCount }) => ({
+              id: deck.id,
+              title: deck.title,
+              topic: deck.topic,
+              tags: deck.tags.map((t) => t.name),
+              cardCount: deck.flashcards.length,
+              attemptCount,
+              latestScore,
+              quizId: deck.quiz?.id ?? null,
+            }))}
+          />
         </div>
       </div>
     </div>

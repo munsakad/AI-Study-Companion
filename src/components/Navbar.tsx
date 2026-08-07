@@ -14,6 +14,7 @@ export default function Navbar() {
           {session ? (
             <>
               <Link href="/dashboard" className="hover:text-gold">Dashboard</Link>
+              <Link href="/analytics" className="hover:text-gold">Analytics</Link>
               <Link href="/decks/new" className="hover:text-gold">New deck</Link>
               <button onClick={() => signOut({ callbackUrl: "/" })} className="rounded bg-gold px-3 py-1.5 text-navy hover:bg-gold-dark">
                 Sign out
