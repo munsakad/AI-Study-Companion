@@ -34,7 +34,7 @@ export default async function ResultsPage({ params }: { params: { id: string; at
           const choices = JSON.parse(a.question.choices) as string[];
           return (
             <div key={a.id} className="card">
-              <p className="font-semibold text-navy">{a.question.prompt}</p>
+              <p className="font-semibold text-ink">{a.question.prompt}</p>
               <p className={`mt-2 text-sm ${a.correct ? "text-ok" : "text-danger"}`}>
                 Your answer: {choices[a.chosenIndex]} {a.correct ? "✓" : "✗"}
               </p>

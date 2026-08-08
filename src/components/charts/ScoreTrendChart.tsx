@@ -9,8 +9,14 @@ const H = 180;
 const PAD = { top: 16, right: 16, bottom: 24, left: 32 };
 const OK = "#007a3d";
 const WARN = "#b5862b";
-const LINE = "#003366";
-const GRID = "#e5e7eb";
+// Read from CSS custom properties (see globals.css) so the chart follows
+// the light/dark theme — Tailwind utility classes don't apply to SVG
+// presentation attributes, but `var()` inside them does.
+const LINE = "rgb(var(--chart-line))";
+const GRID = "rgb(var(--chart-grid))";
+const TEXT_MUTED = "rgb(var(--chart-text-muted))";
+const TEXT = "rgb(var(--chart-text))";
+const SURFACE = "rgb(var(--surface))";
 
 /** Single-series score-over-time line chart. Dots are colored by the
  * pass/fail threshold (>=70%) — a status encoding, not series identity, so
@@ -35,7 +41,7 @@ export default function ScoreTrendChart({ points }: { points: Point[] }) {
         {gridValues.map((v) => (
           <g key={v}>
             <line x1={PAD.left} x2={W - PAD.right} y1={y(v)} y2={y(v)} stroke={GRID} strokeWidth={1} />
-            <text x={PAD.left - 6} y={y(v) + 3} textAnchor="end" fontSize={10} fill="#9ca3af">{v}</text>
+            <text x={PAD.left - 6} y={y(v) + 3} textAnchor="end" fontSize={10} fill={TEXT_MUTED}>{v}</text>
           </g>
         ))}
 
@@ -45,9 +51,9 @@ export default function ScoreTrendChart({ points }: { points: Point[] }) {
           const color = p.scorePercent >= 70 ? OK : WARN;
           return (
             <g key={i}>
-              <circle cx={x(i)} cy={y(p.scorePercent)} r={5} fill={color} stroke="#fff" strokeWidth={2} />
+              <circle cx={x(i)} cy={y(p.scorePercent)} r={5} fill={color} stroke={SURFACE} strokeWidth={2} />
               {i === points.length - 1 && (
-                <text x={x(i)} y={y(p.scorePercent) - 12} textAnchor="middle" fontSize={11} fontWeight={700} fill="#333333">
+                <text x={x(i)} y={y(p.scorePercent) - 12} textAnchor="middle" fontSize={11} fontWeight={700} fill={TEXT}>
                   {Math.round(p.scorePercent)}%
                 </text>
               )}
@@ -65,7 +71,7 @@ export default function ScoreTrendChart({ points }: { points: Point[] }) {
           );
         })}
 
-        {hover !== null && <line x1={x(hover)} x2={x(hover)} y1={PAD.top} y2={PAD.top + plotH} stroke="#003366" strokeWidth={1} strokeDasharray="2,2" opacity={0.4} />}
+        {hover !== null && <line x1={x(hover)} x2={x(hover)} y1={PAD.top} y2={PAD.top + plotH} stroke={LINE} strokeWidth={1} strokeDasharray="2,2" opacity={0.4} />}
       </svg>
 
       {active && (

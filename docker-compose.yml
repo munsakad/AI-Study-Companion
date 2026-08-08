@@ -1,0 +1,46 @@
+# Self-host stack: the app + its own Postgres. Not used for local dev
+# (dev stays on SQLite, zero setup — see README) or for tests (CI uses a
+# throwaway Postgres service container instead). Bring it up with:
+#
+#   docker compose up -d db
+#   docker compose run --rm app npx prisma db push   # first run only
+#   docker compose up -d app
+#
+# and put a real GEMINI_API_KEY + NEXTAUTH_SECRET in a .env file next to
+# this compose file first (docker compose reads .env automatically).
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: devweekends
+      POSTGRES_PASSWORD: devweekends
+      POSTGRES_DB: devweekends
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devweekends"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://devweekends:devweekends@db:5432/devweekends
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?set NEXTAUTH_SECRET in a .env file}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY in a .env file}
+      GENERATION_DAILY_LIMIT: ${GENERATION_DAILY_LIMIT:-10}
+    ports:
+      - "3000:3000"
+
+volumes:
+  db-data:

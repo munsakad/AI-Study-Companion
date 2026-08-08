@@ -38,7 +38,7 @@ export default function DeckSearchFilter({ decks }: { decks: DeckRow[] }) {
         {filtered.map((deck) => (
           <div key={deck.id} className="card">
             <p className="text-xs font-bold uppercase tracking-wide text-navy-light">{deck.topic}</p>
-            <h3 className="mt-1 font-bold text-navy">{deck.title}</h3>
+            <h3 className="mt-1 font-bold text-ink">{deck.title}</h3>
             <p className="mt-1 text-xs text-gray-500">
               {deck.cardCount} cards · {deck.attemptCount} quiz attempt{deck.attemptCount === 1 ? "" : "s"}
             </p>

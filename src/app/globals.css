@@ -2,9 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme tokens. Light values live on bare :root; dark values are
+ * redefined twice — once for the OS-level "system" preference
+ * (prefers-color-scheme, guarded so an explicit data-theme="light" wins
+ * over it) and once for an explicit data-theme="dark" toggle — so both
+ * the system default and the manual toggle work. See ThemeToggle.tsx. */
+:root {
+  --surface: 255 255 255; /* card/input/btn-outline background */
+  --surface-alt: 244 246 248; /* page background */
+  --border: 229 231 235;
+  --border-subtle: 243 244 246;
+  --text-muted-1: 156 163 175;
+  --text-muted-2: 107 114 128;
+  --text-muted-3: 75 85 99;
+  --ink: 51 51 51;
+  --accent: 0 86 179; /* navy-light: accent text (topic eyebrows, links) */
+
+  /* Chart-only tokens (inline SVGs read these via CSS vars, not Tailwind
+   * classes, since SVG presentation attributes can't use utility classes). */
+  --chart-grid: 229 231 235;
+  --chart-text-muted: 156 163 175;
+  --chart-text: 51 51 51;
+  --chart-line: 0 51 102;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: 30 35 45;
+    --surface-alt: 15 18 24;
+    --border: 55 62 75;
+    --border-subtle: 45 51 63;
+    --text-muted-1: 120 128 141;
+    --text-muted-2: 156 165 178;
+    --text-muted-3: 203 210 219;
+    --ink: 229 231 235;
+    --accent: 147 197 253;
+
+    --chart-grid: 55 62 75;
+    --chart-text-muted: 148 158 171;
+    --chart-text: 229 231 235;
+    --chart-line: 147 197 253;
+  }
+}
+
+:root[data-theme="dark"] {
+  --surface: 30 35 45;
+  --surface-alt: 15 18 24;
+  --border: 55 62 75;
+  --border-subtle: 45 51 63;
+  --text-muted-1: 120 128 141;
+  --text-muted-2: 156 165 178;
+  --text-muted-3: 203 210 219;
+  --ink: 229 231 235;
+  --accent: 147 197 253;
+
+  --chart-grid: 55 62 75;
+  --chart-text-muted: 148 158 171;
+  --chart-text: 229 231 235;
+  --chart-line: 147 197 253;
+}
+
 body {
-  background: #f4f6f8;
-  color: #333333;
+  background: rgb(var(--surface-alt));
+  color: rgb(var(--ink));
 }
 
 .btn {
@@ -12,9 +72,9 @@ body {
 }
 .btn-primary { @apply btn bg-gold text-navy hover:bg-gold-dark; }
 .btn-secondary { @apply btn bg-navy text-gold hover:bg-navy-dark; }
-.btn-outline { @apply btn border-2 border-navy text-navy bg-white hover:bg-navy hover:text-gold; }
+.btn-outline { @apply btn border-2 border-navy text-navy hover:bg-navy hover:text-gold; background-color: rgb(var(--surface)); }
 .btn-danger { @apply btn bg-danger text-white hover:opacity-90; }
-.input { @apply w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-ink outline-none focus:border-navy focus:ring-1 focus:ring-navy; }
-.label { @apply mb-1 block text-xs font-bold uppercase tracking-wide text-navy; }
-.card { @apply rounded-lg bg-white p-6 shadow-sm border border-gray-100; }
+.input { @apply w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-ink outline-none focus:border-navy focus:ring-1 focus:ring-navy; background-color: rgb(var(--surface)); }
+.label { @apply mb-1 block text-xs font-bold uppercase tracking-wide text-ink; }
+.card { @apply rounded-lg p-6 shadow-sm border border-gray-100; background-color: rgb(var(--surface)); }
 .badge { @apply inline-flex items-center rounded px-2 py-0.5 text-xs font-bold; }

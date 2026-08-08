@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useToast } from "@/components/ui/ToastProvider";
 
 type Flashcard = { id: string; front: string; back: string };
 type Question = { id: string; prompt: string; choices: string[]; correctIndex: number; explanation: string; locked: boolean };
@@ -21,30 +22,23 @@ async function api(url: string, method: string, body?: unknown) {
 
 export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; flashcards: Flashcard[]; quiz: { id: string; questions: Question[] } | null }) {
   const router = useRouter();
+  const toast = useToast();
   const [title, setTitle] = useState(deck.title);
   const [topic, setTopic] = useState(deck.topic);
   const [tagInput, setTagInput] = useState(deck.tags.join(", "));
   const [cards, setCards] = useState(flashcards);
   const [questions, setQuestions] = useState(quiz?.questions ?? []);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
-  function flash(msg: string) {
-    setNotice(msg);
-    setTimeout(() => setNotice(null), 2500);
-  }
 
   async function saveDeckInfo() {
     setSaving(true);
-    setError(null);
     try {
       const tagNames = tagInput.split(",").map((t) => t.trim()).filter(Boolean);
       await api(`/api/decks/${deck.id}`, "PATCH", { title, topic, tagNames });
-      flash("Deck details saved.");
+      toast.success("Deck details saved.");
       router.refresh();
     } catch (e: any) {
-      setError(e.message);
+      toast.error(e.message);
     } finally {
       setSaving(false);
     }
@@ -55,7 +49,7 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
       const created = await api(`/api/decks/${deck.id}/flashcards`, "POST", { front: "New question", back: "New answer" });
       setCards((c) => [...c, created]);
     } catch (e: any) {
-      setError(e.message);
+      toast.error(e.message);
     }
   }
 
@@ -64,7 +58,7 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
       await api(`/api/flashcards/${id}`, "PATCH", patch);
       setCards((c) => c.map((card) => (card.id === id ? { ...card, ...patch } : card)));
     } catch (e: any) {
-      setError(e.message);
+      toast.error(e.message);
     }
   }
 
@@ -73,7 +67,7 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
       await api(`/api/flashcards/${id}`, "DELETE");
       setCards((c) => c.filter((card) => card.id !== id));
     } catch (e: any) {
-      setError(e.message);
+      toast.error(e.message);
     }
   }
 
@@ -87,7 +81,7 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
       });
       setQuestions((qs) => [...qs, { ...created, locked: false }]);
     } catch (e: any) {
-      setError(e.message);
+      toast.error(e.message);
     }
   }
 
@@ -97,7 +91,7 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
       const updated = await api(`/api/questions/${id}`, "PATCH", body);
       setQuestions((qs) => qs.map((q) => (q.id === id ? { ...q, ...updated } : q)));
     } catch (e: any) {
-      setError(e.message);
+      toast.error(e.message);
     }
   }
 
@@ -106,7 +100,7 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
       await api(`/api/questions/${id}`, "DELETE");
       setQuestions((qs) => qs.filter((q) => q.id !== id));
     } catch (e: any) {
-      setError(e.message);
+      toast.error(e.message);
     }
   }
 
@@ -116,7 +110,7 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
       await api(`/api/decks/${deck.id}`, "DELETE");
       router.push("/dashboard");
     } catch (e: any) {
-      setError(e.message);
+      toast.error(e.message);
     }
   }
 
@@ -151,12 +145,9 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-navy">Edit deck</h1>
+        <h1 className="text-2xl font-bold text-ink">Edit deck</h1>
         <Link href={`/decks/${deck.id}/study`} className="btn-outline !py-1.5 !px-3 text-xs">Back to deck</Link>
       </div>
-
-      {error && <p className="rounded-lg bg-danger/10 px-4 py-2 text-sm text-danger">{error}</p>}
-      {notice && <p className="rounded-lg bg-ok/10 px-4 py-2 text-sm text-ok">{notice}</p>}
 
       <section className="card space-y-3">
         <div>
@@ -182,7 +173,7 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
 
       <section>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-navy">Flashcards ({cards.length})</h2>
+          <h2 className="text-lg font-bold text-ink">Flashcards ({cards.length})</h2>
           <button onClick={addCard} className="btn-outline !py-1.5 !px-3 text-xs">+ Add card</button>
         </div>
         <div className="mt-3 space-y-3">
@@ -200,7 +191,7 @@ export default function DeckEditor({ deck, flashcards, quiz }: { deck: Deck; fla
       {quiz && (
         <section>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-navy">Quiz questions ({questions.length})</h2>
+            <h2 className="text-lg font-bold text-ink">Quiz questions ({questions.length})</h2>
             <button onClick={addQuestion} className="btn-outline !py-1.5 !px-3 text-xs">+ Add question</button>
           </div>
           <div className="mt-3 space-y-3">

@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/ToastProvider";
 
 export default function NewDeckPage() {
   const router = useRouter();
+  const toast = useToast();
   const [mode, setMode] = useState<"paste" | "upload">("paste");
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     const form = new FormData();
     if (mode === "paste") form.append("text", text);
@@ -24,16 +24,21 @@ export default function NewDeckPage() {
     const body = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(body.error ?? "Could not generate study material");
+      if (res.status === 429) {
+        toast.error(body.error ?? "You've hit today's generation limit — try again later.");
+      } else {
+        toast.error(body.error ?? "Could not generate study material");
+      }
       return;
     }
+    toast.success("Deck generated!");
     router.push(`/decks/${body.deckId}/study`);
     router.refresh();
   }
 
   return (
     <div className="mx-auto max-w-xl px-6 py-12">
-      <h1 className="text-2xl font-bold text-navy">Generate a new deck</h1>
+      <h1 className="text-2xl font-bold text-ink">Generate a new deck</h1>
       <p className="mt-1 text-sm text-gray-600">Gemini will turn this into flashcards and a quiz.</p>
 
       <div className="mt-6 flex gap-2">
@@ -71,8 +76,6 @@ export default function NewDeckPage() {
             <p className="mt-1 text-xs text-gray-500">PDF or plain text.</p>
           </div>
         )}
-
-        {error && <p className="text-sm text-danger">{error}</p>}
 
         <button type="submit" disabled={loading} className="btn-secondary w-full">
           {loading ? "Generating with Gemini…" : "Generate flashcards & quiz"}

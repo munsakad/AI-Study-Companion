@@ -25,7 +25,7 @@ export default async function QuizHistoryPage({ params }: { params: { id: string
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-navy-light">{quiz.deck.title}</p>
-          <h1 className="text-2xl font-bold text-navy">{quiz.title} — history</h1>
+          <h1 className="text-2xl font-bold text-ink">{quiz.title} — history</h1>
         </div>
         <Link href={`/quizzes/${quiz.id}/take`} className="btn-secondary !py-1.5 !px-3 text-xs">Retake quiz</Link>
       </div>
@@ -37,15 +37,15 @@ export default async function QuizHistoryPage({ params }: { params: { id: string
           <div className="mt-6 grid grid-cols-3 gap-3 text-center">
             <div className="card !p-3">
               <p className="text-xs text-gray-500">Attempts</p>
-              <p className="text-xl font-bold text-navy">{attempts.length}</p>
+              <p className="text-xl font-bold text-ink">{attempts.length}</p>
             </div>
             <div className="card !p-3">
               <p className="text-xs text-gray-500">Best score</p>
-              <p className="text-xl font-bold text-navy">{Math.round(best!)}%</p>
+              <p className="text-xl font-bold text-ink">{Math.round(best!)}%</p>
             </div>
             <div className="card !p-3">
               <p className="text-xs text-gray-500">Latest score</p>
-              <p className="text-xl font-bold text-navy">{Math.round(latest!.scorePercent)}%</p>
+              <p className="text-xl font-bold text-ink">{Math.round(latest!.scorePercent)}%</p>
             </div>
           </div>
 

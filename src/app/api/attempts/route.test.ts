@@ -82,8 +82,7 @@ describe("POST /api/attempts", () => {
     const res = await POST(
       jsonRequest("http://localhost/api/attempts", "POST", {
         quizId: quiz.id,
-        // @ts-expect-error - deliberately trying to smuggle a fake score
-        scorePercent: 100,
+        scorePercent: 100, // deliberately trying to smuggle a fake score — the route must ignore this
         answers: [{ questionId: quiz.questions[0].id, chosenIndex: 1 }], // actually wrong
       })
     );

@@ -63,31 +63,31 @@ export default async function AnalyticsPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-navy">Analytics</h1>
+        <h1 className="text-2xl font-bold text-ink">Analytics</h1>
         <Link href="/dashboard" className="btn-outline !py-1.5 !px-3 text-xs">Back to dashboard</Link>
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="card !p-3 text-center">
           <p className="text-xs text-gray-500">Decks</p>
-          <p className="text-xl font-bold text-navy">{deckCount}</p>
+          <p className="text-xl font-bold text-ink">{deckCount}</p>
         </div>
         <div className="card !p-3 text-center">
           <p className="text-xs text-gray-500">Flashcards</p>
-          <p className="text-xl font-bold text-navy">{cardCount}</p>
+          <p className="text-xl font-bold text-ink">{cardCount}</p>
         </div>
         <div className="card !p-3 text-center">
           <p className="text-xs text-gray-500">Due now</p>
-          <p className="text-xl font-bold text-navy">{dueCount}</p>
+          <p className="text-xl font-bold text-ink">{dueCount}</p>
         </div>
         <div className="card !p-3 text-center">
           <p className="text-xs text-gray-500">Streak</p>
-          <p className="text-xl font-bold text-navy">{streak > 0 ? `🔥 ${streak}d` : "—"}</p>
+          <p className="text-xl font-bold text-ink">{streak > 0 ? `🔥 ${streak}d` : "—"}</p>
         </div>
       </div>
 
       <section className="mt-8">
-        <h2 className="text-lg font-bold text-navy">Score trend</h2>
+        <h2 className="text-lg font-bold text-ink">Score trend</h2>
         <p className="text-sm text-gray-600">Every quiz attempt, across all decks, in order.</p>
         <div className="card mt-3">
           {allAttempts.length > 0 ? (
@@ -99,7 +99,7 @@ export default async function AnalyticsPage() {
       </section>
 
       <section className="mt-8">
-        <h2 className="text-lg font-bold text-navy">Mastery by topic</h2>
+        <h2 className="text-lg font-bold text-ink">Mastery by topic</h2>
         <p className="text-sm text-gray-600">Latest quiz score per topic — the same 70% line the dashboard uses.</p>
         <div className="card mt-3">
           {masteryBars.length > 0 ? (
@@ -111,7 +111,7 @@ export default async function AnalyticsPage() {
       </section>
 
       <section className="mt-8">
-        <h2 className="text-lg font-bold text-navy">Study activity</h2>
+        <h2 className="text-lg font-bold text-ink">Study activity</h2>
         <p className="text-sm text-gray-600">Flashcard reviews + quiz attempts, last {ACTIVITY_DAYS} days.</p>
         <div className="card mt-3">
           <ActivityBarChart days={activityDays} />

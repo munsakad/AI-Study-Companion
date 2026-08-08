@@ -39,7 +39,7 @@ export default async function DashboardPage() {
     <div className="mx-auto max-w-4xl px-6 py-12">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-navy">Your study dashboard</h1>
+          <h1 className="text-2xl font-bold text-ink">Your study dashboard</h1>
           <StreakBadge userId={session.user.id} />
         </div>
         <div className="flex gap-2">
@@ -50,20 +50,20 @@ export default async function DashboardPage() {
 
       {dueCount > 0 && (
         <Link href="/study/review" className="card mt-4 flex items-center justify-between !py-3 hover:border-navy/30">
-          <span className="text-sm font-semibold text-navy">📚 {dueCount} card{dueCount === 1 ? "" : "s"} due for review</span>
+          <span className="text-sm font-semibold text-ink">📚 {dueCount} card{dueCount === 1 ? "" : "s"} due for review</span>
           <span className="text-xs font-bold text-navy-light">Start review session →</span>
         </Link>
       )}
 
       {weakTopics.length > 0 && (
         <div className="mt-6">
-          <h2 className="text-lg font-bold text-navy">Recommended review</h2>
+          <h2 className="text-lg font-bold text-ink">Recommended review</h2>
           <p className="text-sm text-gray-600">Your most recent score was under 70% on these — worth another pass.</p>
           <div className="mt-3 space-y-2">
             {weakTopics.map(({ deck, latestScore }) => (
               <div key={deck.id} className="card flex items-center justify-between !p-4">
                 <div>
-                  <p className="font-bold text-navy">{deck.title}</p>
+                  <p className="font-bold text-ink">{deck.title}</p>
                   <p className="text-xs text-gray-500">{deck.topic}</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
       )}
 
       <div className="mt-8">
-        <h2 className="text-lg font-bold text-navy">All decks</h2>
+        <h2 className="text-lg font-bold text-ink">All decks</h2>
         <div className="mt-3">
           <DeckSearchFilter
             decks={withScore.map(({ deck, latestScore, attemptCount }) => ({

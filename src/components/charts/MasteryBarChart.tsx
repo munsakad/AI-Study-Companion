@@ -6,6 +6,8 @@ type Bar = { topic: string; scorePercent: number };
 
 const OK = "#007a3d";
 const WARN = "#b5862b";
+const TEXT = "rgb(var(--chart-text))";
+const TRACK = "rgb(var(--surface-alt))";
 const ROW_H = 28;
 const GAP = 8;
 
@@ -31,12 +33,12 @@ export default function MasteryBarChart({ bars }: { bars: Bar[] }) {
         const isHover = hover === i;
         return (
           <g key={b.topic} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}>
-            <text x={labelW - 8} y={y + ROW_H / 2 + 4} textAnchor="end" fontSize={12} fontWeight={600} fill="#333333">
+            <text x={labelW - 8} y={y + ROW_H / 2 + 4} textAnchor="end" fontSize={12} fontWeight={600} fill={TEXT}>
               {b.topic.length > 16 ? b.topic.slice(0, 15) + "…" : b.topic}
             </text>
-            <rect x={labelW} y={y} width={trackW} height={ROW_H} rx={4} fill="#f4f6f8" />
+            <rect x={labelW} y={y} width={trackW} height={ROW_H} rx={4} fill={TRACK} />
             <rect x={labelW} y={y} width={w} height={ROW_H} rx={4} fill={color} opacity={isHover ? 1 : 0.9} />
-            <text x={labelW + w + 8} y={y + ROW_H / 2 + 4} fontSize={12} fontWeight={700} fill="#333333">
+            <text x={labelW + w + 8} y={y + ROW_H / 2 + 4} fontSize={12} fontWeight={700} fill={TEXT}>
               {Math.round(b.scorePercent)}%
             </text>
           </g>

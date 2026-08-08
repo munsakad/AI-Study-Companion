@@ -20,7 +20,7 @@ export default async function TakeQuizPage({ params }: { params: { id: string } 
 
   return (
     <div className="mx-auto max-w-xl px-6 py-12">
-      <h1 className="text-2xl font-bold text-navy">{quiz.title}</h1>
+      <h1 className="text-2xl font-bold text-ink">{quiz.title}</h1>
       <TakeQuiz quizId={quiz.id} questions={questions} />
     </div>
   );

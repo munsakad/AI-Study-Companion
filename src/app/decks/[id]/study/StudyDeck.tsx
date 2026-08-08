@@ -29,7 +29,7 @@ export default function StudyDeck({ cards }: { cards: Card[] }) {
         onClick={() => setFlipped((f) => !f)}
         className="card mt-3 flex min-h-[220px] w-full items-center justify-center p-8 text-center transition-transform hover:-translate-y-0.5"
       >
-        <p className="text-lg font-semibold text-navy">{flipped ? card.back : card.front}</p>
+        <p className="text-lg font-semibold text-ink">{flipped ? card.back : card.front}</p>
       </button>
       <p className="mt-2 text-center text-xs text-gray-400">{flipped ? "Answer — click to flip back" : "Click card to reveal answer"}</p>
 

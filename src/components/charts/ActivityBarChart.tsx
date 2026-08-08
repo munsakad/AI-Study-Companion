@@ -4,8 +4,9 @@ import { useState } from "react";
 
 type Day = { date: string; count: number };
 
-const NAVY = "#003366";
-const GRID = "#e5e7eb";
+const NAVY = "rgb(var(--chart-line))";
+const GRID = "rgb(var(--chart-grid))";
+const TEXT_MUTED = "rgb(var(--chart-text-muted))";
 
 /** Daily study-activity bars (flashcard reviews + quiz attempts) over the
  * last N days. Single series measuring magnitude -> one hue, varying only
@@ -37,7 +38,7 @@ export default function ActivityBarChart({ days }: { days: Day[] }) {
             <g key={d.date} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}>
               <rect x={x} y={y} width={barW} height={Math.max(2, h)} rx={3} fill={NAVY} opacity={d.count === 0 ? 0.08 : hover === i ? 1 : 0.55} />
               {showLabel && (
-                <text x={x + barW / 2} y={H - 4} textAnchor="middle" fontSize={9} fill="#9ca3af">
+                <text x={x + barW / 2} y={H - 4} textAnchor="middle" fontSize={9} fill={TEXT_MUTED}>
                   {new Date(d.date).toLocaleDateString(undefined, { day: "numeric", month: "short" }).replace(" ", "")}
                 </text>
               )}

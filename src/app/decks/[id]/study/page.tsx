@@ -21,7 +21,7 @@ export default async function StudyPage({ params }: { params: { id: string } }) 
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-navy-light">{deck.topic}</p>
-          <h1 className="text-2xl font-bold text-navy">{deck.title}</h1>
+          <h1 className="text-2xl font-bold text-ink">{deck.title}</h1>
         </div>
         <div className="flex gap-2">
           <Link href={`/study/review?deckId=${deck.id}`} className="btn-outline !py-1.5 !px-3 text-xs">Review due cards</Link>

@@ -20,7 +20,7 @@ export default async function ReviewPage({ searchParams }: { searchParams: { dec
 
   return (
     <div className="mx-auto max-w-xl px-6 py-12">
-      <h1 className="text-2xl font-bold text-navy">Review session</h1>
+      <h1 className="text-2xl font-bold text-ink">Review session</h1>
       <p className="mt-1 text-sm text-gray-600">
         {searchParams.deckId ? `Cards due from ${cards[0]?.deck.title ?? "this deck"}.` : "Cards due across all your decks."}
       </p>

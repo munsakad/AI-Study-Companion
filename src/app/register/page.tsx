@@ -38,7 +38,7 @@ export default function RegisterPage() {
 
   return (
     <div className="mx-auto max-w-sm px-6 py-16">
-      <h1 className="text-center text-2xl font-bold text-navy">Create your account</h1>
+      <h1 className="text-center text-2xl font-bold text-ink">Create your account</h1>
       <form onSubmit={onSubmit} className="card mt-6 space-y-4">
         <div>
           <label className="label">Full name</label>
