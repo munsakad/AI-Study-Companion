@@ -1,0 +1,45 @@
+{
+  "move": {
+    "app/decks/[id]/study/StudyDeck.tsx": "app/decks/study/StudyDeck.tsx",
+    "app/decks/[id]/edit/DeckEditor.tsx": "app/decks/edit/DeckEditor.tsx",
+    "app/quizzes/[id]/take/TakeQuiz.tsx": "app/quizzes/take/TakeQuiz.tsx"
+  },
+  "remove": [
+    "app/api",
+    "middleware.ts",
+    "app/decks/[id]",
+    "app/quizzes/[id]"
+  ],
+  "patch": [
+    {
+      "file": "components/DeckSearchFilter.tsx",
+      "find": "`/decks/${deck.id}/study`",
+      "replace": "`/decks/study?id=${deck.id}`"
+    },
+    {
+      "file": "components/DeckSearchFilter.tsx",
+      "find": "`/quizzes/${deck.quizId}/take`",
+      "replace": "`/quizzes/take?id=${deck.quizId}`"
+    },
+    {
+      "file": "components/DeckSearchFilter.tsx",
+      "find": "`/quizzes/${deck.quizId}/history`",
+      "replace": "`/quizzes/history?id=${deck.quizId}`"
+    },
+    {
+      "file": "app/quizzes/take/TakeQuiz.tsx",
+      "find": "`/quizzes/${quizId}/results/${body.attemptId}`",
+      "replace": "`/quizzes/results?id=${quizId}&attemptId=${body.attemptId}`"
+    },
+    {
+      "file": "app/decks/edit/DeckEditor.tsx",
+      "find": "`/decks/${deck.id}/study`",
+      "replace": "`/decks/study?id=${deck.id}`"
+    },
+    {
+      "file": "app/decks/new/page.tsx",
+      "find": "`/decks/${body.deckId}/study`",
+      "replace": "`/decks/study?id=${body.deckId}`"
+    }
+  ]
+}
