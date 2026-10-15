@@ -72,11 +72,8 @@ export async function generateStudyMaterial(sourceText: string): Promise<StudyGe
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    // gemini-2.0-flash was deprecated and shut down June 1, 2026 — every
-    // request against it fails with a 429 "limit: 0" quota error regardless
-    // of the key, which looks identical to an actual rate limit. Current
-    // free-tier default per https://ai.google.dev/gemini-api/docs/models.
-    model: "gemini-3.6-flash",
+    // Stable Flash model: https://ai.google.dev/gemini-api/docs/models.
+    model: "gemini-3.8-flash",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: generationSchema as any,
