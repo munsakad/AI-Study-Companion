@@ -73,7 +73,7 @@ export async function generateStudyMaterial(sourceText: string): Promise<StudyGe
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
     // Stable Flash model: https://ai.google.dev/gemini-api/docs/models.
-    model: "gemini-3.8-flash",
+    model: "gemini-3.5-flash-lite",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: generationSchema as any,
